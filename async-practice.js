@@ -317,7 +317,30 @@ async function fetchData(url) {
         console.error(`Failed to fetch from ${url}:`, error);
     }
     }
-// A single user from JSONPlaceholder
-// All users (https://jsonplaceholder.typicode.com/users)
-// Posts for user 1 (https://jsonplaceholder.typicode.com/users/1/posts)
 
+
+async function runPractice() {
+// A single user from JSONPlaceholder
+    const singleUser = await fetchData("https://typicode.com");
+    console.log("1. Single User:", singleUser);
+    console.log(`Name: ${singleUser.name}, Email: ${singleUser.email}`);
+
+// All users (https://jsonplaceholder.typicode.com/users)
+    const allUsers = await fetchData("https://typicode.com");
+    console.log("\n2. All Users (Count):", allUsers.length);
+    allUsers.forEach(user => {
+        console.log(`- [${user.id}] ${user.name} (${user.address.city})`);
+    });
+
+// Posts for user 1 (https://jsonplaceholder.typicode.com/users/1/posts)
+    const userPosts = await fetchData("https://typicode.com/posts");
+    console.log("\n3. Posts for User 1 (Count):", userPosts.length);
+    userPosts.forEach(post => {
+        console.log(`- Post #${post.id}: ${post.title}`);
+    });
+}
+
+// Run all three tasks
+runPractice();
+
+// Task 12.2: Display API Data in DOM 🟡
