@@ -175,7 +175,7 @@ historyList.addEventListener("click", (event) => {
 });
 
 
-// renderHistory();   ← uncomment when STEP 4 works
+renderHistory();   
 
 
 // ============================================
