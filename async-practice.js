@@ -1,7 +1,13 @@
+// ============================================
 // Lesson 11 Tasks
+// ===========================================
+
+// ===========================================
 // Task 11.1: Understanding Async 🟢
+// ============================================   
 
 // Exercise 1: Synchronous vs Asynchronous
+
 // Synchronous - blocks until complete
 console.log("1 - Start");
 console.log("2 - Middle");
@@ -61,4 +67,82 @@ loadUser(1, function(user) {
 console.log("Loading user...");
  // output: Loading user..., then after 1.5 seconds: User loaded: { id: 1, name: "Cate" }   
 
- 
+ // =======================================================
+ // Task 11.2: Callback Hell & Introduction to Promises 🟡
+ // =======================================================
+
+// Exercise 1: Experience Callback Hell
+
+// This is BAD - "Callback Hell" or "Pyramid of Doom"
+
+ function getUserData(userId) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() =>    {
+            if (userId>0) {
+                resolve({ id: userId, name: "John" });
+            } else {
+                reject(new Error("Invalid user ID"));
+            }
+        }, 1000);
+    });
+}
+
+
+function getUserPosts(userId) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (userId > 0) {
+                resolve([
+                    { id: 1, title: "Post 1" },
+                    { id: 2, title: "Post 2" }
+                ]);
+            } else {
+                reject(new Error("Invalid user ID"));
+            }
+        }, 1000);
+    });
+}
+
+function getPostComments(postId) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (postId > 0) {
+                resolve([
+                    { id: 1, text: "Great post!" },
+                    { id: 2, text: "Thanks for sharing" }
+                ]);
+            } else {
+                reject(new Error("Invalid post ID"));
+            }
+        }, 1000);
+    });
+}
+   
+getUserData(1)
+    .then(user => console.log("Got:", user))
+    .catch(err => console.log("Problem:", err.message));
+
+// Exercise 2: Promises to the Rescue
+
+// Creating a Promise
+const myPromise = new Promise((resolve, reject) => {
+    const success = true;
+    
+    setTimeout(() => {
+        if (success) {
+            resolve("It worked!");
+        } else {
+            reject("Something went wrong");
+        }
+    }, 1000);
+});
+
+// Using a Promise
+myPromise
+    .then(result => {
+        console.log("Success:", result);
+    })
+    .catch(error => {
+        console.log("Error:", error);
+    });
+
