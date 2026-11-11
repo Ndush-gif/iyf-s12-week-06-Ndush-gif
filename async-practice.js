@@ -124,25 +124,138 @@ getUserData(1)
 
 // Exercise 2: Promises to the Rescue
 
-// Creating a Promise
-const myPromise = new Promise((resolve, reject) => {
-    const success = true;
-    
-    setTimeout(() => {
-        if (success) {
-            resolve("It worked!");
-        } else {
-            reject("Something went wrong");
-        }
-    }, 1000);
-});
-
-// Using a Promise
-myPromise
-    .then(result => {
-        console.log("Success:", result);
-    })
-    .catch(error => {
-        console.log("Error:", error);
+//   // Exercise 2: Promises
+    const myPromise = new Promise((resolve, reject) => {
+        const success = true; // change to false to see .catch run
+        setTimeout(() => {
+            if (success) {
+                resolve("It worked!");
+            } else {
+                reject("Something went wrong");
+            }
+        }, 1000);
     });
+ 
+    await myPromise
+        .then((result) => console.log("Success:", result))
+        .catch((error) => console.log("Error:", error));
+ 
+    // Test the reject cases
+    await getUserData(0).catch((err) => console.log("Problem:", err.message));
+    await getUserPosts(0).catch((err) => console.log("Problem:", err.message));
+    await getPostComments(0).catch((err) => console.log("Problem:", err.message));
 
+ 
+// ============================================
+// Task 11.3: Promise Chaining
+// ============================================
+async function task113() {
+    console.log("\n===== Task 11.3 =====");
+ 
+    // Exercise 1: chain promises
+    await getUserData(1)
+        .then((user) => {
+            console.log("User:", user);
+            return getUserPosts(user.id);
+        })
+        .then((posts) => {
+            console.log("Posts:", posts);
+            return getPostComments(posts[0].id);
+        })
+        .then((comments) => {
+            console.log("Comments:", comments);
+        })
+        .catch((error) => {
+            console.error("Error:", error.message);
+        });
+ 
+    // Exercise 2: Promise.all (runs at the same time, about 1 second total)
+    await Promise.all([getUserData(1), getUserData(2), getUserData(3)])
+        .then((results) => {
+            console.log("All users:", results);
+            results.forEach((user) => console.log(`User ${user.id}: ${user.name}`));
+        })
+        .catch((error) => {
+            console.error("One failed:", error.message);
+        });
+ 
+    // Exercise 3: Promise.race (first to finish wins)
+    const fast = new Promise((resolve) => setTimeout(() => resolve("Fast!"), 100));
+    const slow = new Promise((resolve) => setTimeout(() => resolve("Slow!"), 500));
+ 
+    await Promise.race([fast, slow]).then((result) => {
+        console.log("Winner:", result); // "Fast!"
+    });
+}
+ 
+// ============================================
+// Task 11.4: Async/Await
+// ============================================
+ 
+// Exercise 1: the promise chain rewritten with async/await
+async function getDataWithAsync() {
+    const user = await getUserData(1);
+    const posts = await getUserPosts(user.id);
+    const comments = await getPostComments(posts[0].id);
+    return comments;
+}
+ 
+// Exercise 2: error handling with try/catch
+async function fetchUserData(userId) {
+    try {
+        const user = await getUserData(userId);
+        const posts = await getUserPosts(user.id);
+        return { user, posts };
+    } catch (error) {
+        console.error("Failed to fetch:", error.message);
+        throw error; // re-throw if needed
+    }
+}
+ 
+// Exercise 3: parallel with async/await
+async function getAllUsers() {
+    const [u1, u2, u3] = await Promise.all([
+        getUserData(1),
+        getUserData(2),
+        getUserData(3)
+    ]);
+    return [u1, u2, u3];
+}
+ 
+async function task114() {
+    console.log("\n===== Task 11.4 =====");
+ 
+    const comments = await getDataWithAsync();
+    console.log("Comments:", comments);
+ 
+    const data = await fetchUserData(1);
+    console.log("User and posts:", data);
+ 
+    try {
+        await fetchUserData(0);
+    } catch (error) {
+        console.log("Caught in main:", error.message);
+    }
+ 
+    console.time("parallel");
+    const users = await getAllUsers();
+    console.timeEnd("parallel");
+    console.log("All users:", users);
+ 
+    // Build: the callback hell example rewritten with async/await
+    // (this is getDataWithAsync above: flat, readable, one try/catch)
+}
+ 
+// ============================================
+// Run everything in order
+// ============================================
+async function main() {
+    await task111();
+    await task112();
+    await task113();
+    await task114();
+    console.log("\nAll Lesson 11 tasks done!");
+}
+ 
+main();
+ 
