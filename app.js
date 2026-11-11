@@ -40,6 +40,18 @@ const pressure = document.getElementById("pressure");
 //   WHY: fetch does NOT reject on 404. It only rejects when there's no network.
 // ============================================
 async function fetchWeather(city) {
+    const url = `${BASE_URL}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        if (response.status === 404) {
+            throw new Error("City not found");
+        } else if (response.status === 401) {
+            throw new Error("API key not valid yet …");
+        } else {
+            throw new Error("Failed to fetch weather data");
+        }
+    }
+    return await response.json();
 }
 
 
@@ -53,6 +65,24 @@ async function fetchWeather(city) {
 //   - finally{ hideLoading(); }   ← runs whether it worked or not
 // ============================================
 async function getWeather(city) {
+    const apiKeyMissing = typeof API_KEY === "undefined" || !API_KEY;
+    if (apiKeyMissing) {
+        showError("Missing API key: copy config.example.js to config.js …");
+        return;
+    }
+
+    showLoading();
+    hideError();
+
+    try {
+        const data = await fetchWeather(city);
+        displayWeather(data);
+        saveToHistory(data.name);
+    } catch (err) {
+      err.name === "TypeError" ? "Network error — check your connection" : err.message; } 
+    finally {
+        hideLoading();
+    }
 }
 
 
@@ -65,6 +95,16 @@ async function getWeather(city) {
 //   Tip: console.log(data) first and read the shape.
 // ============================================
 function displayWeather(data) {
+    cityName.textContent = `${data.name}, ${data.sys.country}`;
+    weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+    weatherIcon.alt = data.weather[0].description;
+    temperature.textContent = `${Math.round(data.main.temp)}°C`;
+    description.textContent = data.weather[0].description;
+    feelsLike.textContent = `${Math.round(data.main.feels_like)}°C`;
+    humidity.textContent = `${data.main.humidity}%`;
+    wind.textContent = `${data.wind.speed} m/s`;
+    pressure.textContent = `${data.main.pressure} hPa`;
+    weatherDisplay.classList.remove("hidden");
 }
 
 // Helpers (given)
@@ -82,10 +122,32 @@ function hideError() { errorBox.classList.add("hidden"); }
 //   renderHistory(): one <li><button class="history-item">city</button></li> per city (textContent)
 // ============================================
 function loadRecent() {
+    try {
+        return JSON.parse(localStorage.getItem("recent")) || [];
+    } catch (err) {
+        console.error("Error loading recent searches:", err);
+        return [];
+    }
 }
 function saveToHistory(city) {
+    recent = recent.filter(c => c.toLowerCase() !== city.toLowerCase());
+    recent.unshift(city);
+    if (recent.length > MAX_RECENT) {
+        recent = recent.slice(0, MAX_RECENT);
+    }
+    localStorage.setItem("recent", JSON.stringify(recent));
+    renderHistory();
 }
 function renderHistory() {
+    historyList.innerHTML = "";
+    recent.forEach(city => {
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        button.className = "history-item";
+        button.textContent = city;
+        li.appendChild(button);
+        historyList.appendChild(li);
+    });
 }
 let recent = loadRecent();
 
