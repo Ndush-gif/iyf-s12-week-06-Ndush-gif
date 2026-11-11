@@ -259,3 +259,65 @@ async function main() {
  
 main();
  
+// ============================================
+// Lesson 12 Tasks
+// ============================================
+
+// Task 12.1: Fetch API Basics 🟢
+// Exercise 1: Your First Fetch
+// Basic fetch
+fetch("https://jsonplaceholder.typicode.com/users/1")
+    .then(response => {
+        console.log("Response object:", response);
+        console.log("Status:", response.status);
+        console.log("OK:", response.ok);
+        return response.json();  // Parse JSON
+    })
+    .then(data => {
+        console.log("User data:", data);
+    })
+    .catch(error => {
+        console.error("Fetch error:", error);
+    });
+
+    // Exercise 2: Fetch with Async/Await
+
+async function getUser(id) {
+    try {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch user:", error);
+    }
+}
+
+// Use it — inside an async function. A top-level `await` only works in the
+// DevTools Console or a <script type="module">; in a normal script file it is a SyntaxError.
+async function main() {
+    const user = await getUser(1);
+    console.log(user);
+}
+main();
+
+// Practice: Fetch and display:
+async function fetchData(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Failed to fetch from ${url}:`, error);
+    }
+    }
+// A single user from JSONPlaceholder
+// All users (https://jsonplaceholder.typicode.com/users)
+// Posts for user 1 (https://jsonplaceholder.typicode.com/users/1/posts)
+
