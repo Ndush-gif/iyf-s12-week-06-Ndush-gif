@@ -158,6 +158,21 @@ let recent = loadRecent();
 //   - ONE click listener on historyList (delegation, Week 5):
 //       const btn = event.target.closest(".history-item"); if (btn) getWeather(btn.textContent);
 // ============================================
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const city = cityInput.value.trim();
+    if (city) {
+        getWeather(city);
+        cityInput.value = "";
+    }
+});
+
+historyList.addEventListener("click", (event) => {
+    const btn = event.target.closest(".history-item");
+    if (btn) {
+        getWeather(btn.textContent);
+    }
+});
 
 
 // renderHistory();   ← uncomment when STEP 4 works
