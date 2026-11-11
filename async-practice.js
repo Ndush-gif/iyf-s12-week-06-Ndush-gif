@@ -400,3 +400,40 @@ function displayUsers(users) {
 
 // Initialize
 loadUsers();
+
+// Task 12.3: POST Requests 🟡
+// Exercise: Creating Resources
+
+async function createPost(title, body, userId) {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            title,
+            body,
+            userId
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error("Failed to create post");
+    }
+    
+    return response.json();
+}
+
+// Use it — inside an async function (see Task 12.1)
+async function demo() {
+    const newPost = await createPost(
+        "My First Post",
+        "This is the content of my post.",
+        1
+    );
+    console.log("Created:", newPost);
+}
+demo();
+
+// Build: Create a form that submits a new post and displays the result.
+
