@@ -74,13 +74,13 @@ async function getWeather(city) {
     showLoading();
     hideError();
 
-    try {
+        try {
         const data = await fetchWeather(city);
         displayWeather(data);
         saveToHistory(data.name);
     } catch (err) {
-      err.name === "TypeError" ? "Network error — check your connection" : err.message; } 
-    finally {
+        showError(err.name === "TypeError" ? "Network error — check your connection" : err.message);
+    } finally {
         hideLoading();
     }
 }
